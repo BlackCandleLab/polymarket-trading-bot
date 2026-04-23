@@ -1,6 +1,6 @@
 # Polymarket BTC Up/Down Trading Bot
 
-**Repository:** [https://github.com/Parallax-Trading/polymarket-copy-trading-bot](https://github.com/Parallax-Trading/polymarket-copy-trading-bot)
+**Repository:** [https://github.com/SmartOrder-Systems/polymarket-copy-trading-bot](https://github.com/SmartOrder-Systems/polymarket-copy-trading-bot)
 
 A professional-grade Node.js trading bot for Polymarket short-duration Up/Down markets on Polygon.
 
