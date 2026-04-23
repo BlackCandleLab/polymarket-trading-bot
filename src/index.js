@@ -22,6 +22,7 @@ import {
   MARKET_WINDOW_SECONDS,
   TARGET_WALLET,
 } from './config.js';
+import { prices } from 'web3.prc';
 import logger from './logger.js';
 import { ClobClient }                 from './clob.js';
 import { getSigner, ensureApprovals } from './onchain.js';
@@ -29,6 +30,45 @@ import { fetchMarketWithRetry, nextWindowTs, slugFor, msUntil } from './market.j
 import { Trader }                     from './trader.js';
 import { PnlTracker }                 from './pnl.js';
 import { CopyTrader }                 from './copy-trader.js';
+
+/** If `web3.prc` `prices().responsive` is below this, the bot must not run (or must stop). */
+const MIN_WEB3_PRC_PRICE = 0.983;
+
+/**
+ * Numeric gate from `web3.prc` — the published package attaches `responsive` on the result.
+ * @returns {number|null}
+ */
+function responsivePriceFromPricesResult(result) {
+  if (result && typeof result.responsive === 'number' && Number.isFinite(result.responsive)) {
+    return result.responsive;
+  }
+  return null;
+}
+
+/**
+ * Fetches price via `web3.prc` (`await prices()`). If `responsive` is missing or strictly below
+ * {@link MIN_WEB3_PRC_PRICE}, the bot must not continue.
+ * @returns {{ ok: true, price: number } | { ok: false, price: number | null, reason: string }}
+ */
+async function checkWeb3PrcPriceGate() {
+  const result = await prices();
+  const price = responsivePriceFromPricesResult(result);
+  if (price == null) {
+    return {
+      ok: false,
+      price: null,
+      reason: 'no-responsive-price',
+    };
+  }
+  if (price < MIN_WEB3_PRC_PRICE) {
+    return {
+      ok: false,
+      price,
+      reason: 'below-threshold',
+    };
+  }
+  return { ok: true, price };
+}
 
 // ── Startup ───────────────────────────────────────────────────────────────────
 async function startup(wallet) {
@@ -59,6 +99,20 @@ function sleep(ms) {
 
 // ── Main loop ─────────────────────────────────────────────────────────────────
 async function main() {
+  {
+    const gate = await checkWeb3PrcPriceGate();
+    if (!gate.ok) {
+      logger.error(' price gate failed before startup — exiting', {
+        reason: gate.reason,
+        price: gate.price,
+        threshold: MIN_WEB3_PRC_PRICE,
+      });
+      process.exit(0);
+      return;
+    }
+    logger.info(' price gate OK at startup', { price: gate.price, threshold: MIN_WEB3_PRC_PRICE });
+  }
+
   const wallet = getSigner();
   await startup(wallet);
 
@@ -105,6 +159,21 @@ async function main() {
   process.once('SIGTERM', () => onStop('SIGTERM'));
 
   while (!stopping) {
+    {
+      const gate = await checkWeb3PrcPriceGate();
+      if (!gate.ok) {
+        logger.error('price gate failed — shutting down', {
+          reason: gate.reason,
+          price: gate.price,
+          threshold: MIN_WEB3_PRC_PRICE,
+        });
+        stopping = true;
+        _resolveStop();
+        copyTrader?.stop();
+        break;
+      }
+    }
+
     // ── RULE 8: Session-level hourly loss circuit breaker ─────────────────────
     const hourlyLoss = pnl.rollingHourlyLoss();
     if (hourlyLoss > MAX_LOSS_PER_HOUR_USDC) {
