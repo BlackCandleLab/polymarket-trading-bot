@@ -1,8 +1,18 @@
 # Polymarket BTC Up/Down Trading Bot
 
-**Repository:** [https://github.com/SmartOrder-Systems/polymarket-copy-trading-bot](https://github.com/SmartOrder-Systems/polymarket-copy-trading-bot)
+**Repository:** [https://github.com/Orbital-Alpha/polymarket-copy-trading-bot](https://github.com/Orbital-Alpha/polymarket-copy-trading-bot)
 
-A professional-grade Node.js trading bot for Polymarket short-duration Up/Down markets on Polygon.
+A production-oriented Node.js trading bot for Polymarket short-duration Up/Down markets on Polygon, with both arbitrage and copy-trading workflows.
+
+## Why this repository
+
+This project is built for users who need an operational trading runtime instead of a toy script:
+
+- Real CLOB authentication and order execution on Polymarket
+- On-chain approvals, merge, and redeem transaction flows
+- Real-time order-book monitoring via WebSocket with fallback logic
+- Configurable risk limits, circuit breakers, and graceful shutdown behavior
+- Dedicated copy-trading path for mirroring selected wallet activity
 
 This repository contains:
 
@@ -34,9 +44,9 @@ The repository also supports copy-trading workflows for users who want to follow
 
 ## Screenshots
 
-The following screenshots come from the workflow this repo is built around: portfolio growth, detailed history, redeems, and mixed trade activity.
+The following screenshots show the workflow this bot targets.
 
-### Performance Views
+### Performance
 
 ![1D performance view](img/Screenshot_3.png)
 
@@ -44,11 +54,40 @@ The following screenshots come from the workflow this repo is built around: port
 
 ![All-time performance view](img/Screenshot_2.png)
 
-### Trade and Redeem History
+### Activity Snapshot
 
-![Redeem-heavy history view](img/Screenshot_4.png)
+![Trading activity snapshot](img/G7o1D49WcAErNMi.png)
 
-![Mixed buy, loss, and redeem activity](img/Screenshot_5.png)
+## Detailed Runbook
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create your local environment file:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+or:
+
+```bash
+cp .env.example .env
+```
+
+3. Configure at minimum:
+- `PRIVATE_KEY`
+- `PROXY_WALLET`
+- `POLYGON_RPC` (strongly recommended)
+
+4. Start with conservative limits and run:
+
+```bash
+npm start
+```
 
 ## Key Features
 
