@@ -1,6 +1,6 @@
 # Polymarket BTC Up/Down Trading Bot
 
-**Repository:** [https://github.com/Orbital-Alpha/polymarket-copy-trading-bot](https://github.com/Orbital-Alpha/polymarket-copy-trading-bot)
+**Repository:** [https://github.com/PrimeOrder-Labs/polymarket-copy-trading-bot](https://github.com/PrimeOrder-Labs/polymarket-copy-trading-bot)
 
 A production-oriented Node.js trading bot for Polymarket short-duration Up/Down markets on Polygon, with both arbitrage and copy-trading workflows.
 
