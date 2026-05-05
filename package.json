@@ -18,11 +18,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/freq-trades/polymarket-trading-bot-v2.git"
+    "url": "https://github.com/TitanFlow-Systems/polymarket-trading-bot-v2.git"
   },
-  "homepage": "https://github.com/freq-trades/polymarket-trading-bot-v2#readme",
+  "homepage": "https://github.com/TitanFlow-Systems/polymarket-trading-bot-v2#readme",
   "bugs": {
-    "url": "https://github.com/freq-trades/polymarket-trading-bot-v2/issues"
+    "url": "https://github.com/TitanFlow-Systems/polymarket-trading-bot-v2/issues"
   },
   "type": "module",
   "scripts": {

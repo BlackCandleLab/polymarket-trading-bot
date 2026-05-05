@@ -1,6 +1,6 @@
 # Polymarket BTC Up/Down Trading Bot
 
-**Repository:** [github.com/freq-trades/polymarket-trading-bot-v2](https://github.com/freq-trades/polymarket-trading-bot-v2)
+**Repository:** [github.com/TitanFlow-Systems/polymarket-trading-bot-v2](https://github.com/TitanFlow-Systems/polymarket-trading-bot-v2)
 
 A production-oriented Node.js trading bot for Polymarket short-duration Up/Down markets on Polygon, with both arbitrage and copy-trading workflows.
 
