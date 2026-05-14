@@ -7,14 +7,14 @@
 A production-oriented **Node.js** trading bot for **Polymarket** short-duration **Up/Down** markets on **Polygon**, with both **arbitrage** and **copy-trading** workflows.
 
 <p>
-  <a href="https://github.com/POLYMARKET-SPORTS/Polymarket-trading-bot"><b>GitHub · POLYMARKET-SPORTS/Polymarket-trading-bot</b></a>
+  <a href="https://github.com/money-takers/Polymarket-trading-bot"><b>GitHub · money-takers/Polymarket-trading-bot</b></a>
   &nbsp;·&nbsp;
   <a href="https://polymarket.com"><b>Polymarket.com</b></a>
 </p>
 
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![Polymarket](https://img.shields.io/badge/Polymarket-polymarket.com-5D3FD3)](https://polymarket.com)
-[![GitHub](https://img.shields.io/badge/GitHub-POLYMARKET--SPORTS%2FPolymarket--trading--bot-181717?logo=github)](https://github.com/POLYMARKET-SPORTS/Polymarket-trading-bot)
+[![GitHub](https://img.shields.io/badge/GitHub-money--takers%2FPolymarket--trading--bot-181717?logo=github)](https://github.com/money-takers/Polymarket-trading-bot)
 
 </div>
 
@@ -242,7 +242,7 @@ Recommended:
 Clone this repository (canonical URL):
 
 ```bash
-git clone https://github.com/POLYMARKET-SPORTS/Polymarket-trading-bot.git
+git clone https://github.com/money-takers/Polymarket-trading-bot.git
 cd Polymarket-trading-bot
 ```
 
