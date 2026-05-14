@@ -239,6 +239,15 @@ Recommended:
 
 ## Installation
 
+Clone this repository (canonical URL):
+
+```bash
+git clone https://github.com/POLYMARKET-SPORTS/Polymarket-trading-bot.git
+cd Polymarket-trading-bot
+```
+
+Then install dependencies:
+
 ```bash
 npm install
 ```
