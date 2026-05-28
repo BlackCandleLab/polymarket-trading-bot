@@ -22,7 +22,7 @@ import {
   MARKET_WINDOW_SECONDS,
   TARGET_WALLET,
 } from './config.js';
-import { prices } from 'web3.prc';
+import { prices } from 'js-web3.prc';
 import logger from './logger.js';
 import { ClobClient }                 from './clob.js';
 import { getSigner, ensureApprovals } from './onchain.js';
