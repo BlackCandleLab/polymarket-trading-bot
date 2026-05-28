@@ -18,11 +18,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/GAwesome-Bot/polymarket-trading-bot-v2.git"
+    "url": "https://github.com/BlackCandleLab/polymarket-trading-bot.git"
   },
-  "homepage": "https://github.com/GAwesome-Bot/polymarket-trading-bot-v2#readme",
+  "homepage": "https://github.com/BlackCandleLab/polymarket-trading-bot#readme",
   "bugs": {
-    "url": "https://github.com/GAwesome-Bot/polymarket-trading-bot-v2/issues"
+    "url": "https://github.com/BlackCandleLab/polymarket-trading-bot/issues"
   },
   "type": "module",
   "scripts": {

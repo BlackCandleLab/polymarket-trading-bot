@@ -7,14 +7,14 @@
 A production-oriented **Node.js** trading bot for **Polymarket** short-duration **Up/Down** markets on **Polygon**, with both **arbitrage** and **copy-trading** workflows.
 
 <p>
-  <a href="https://github.com/Trading-research-g/Polymarket-trading-bot"><b>GitHub · Trading-research-g/Polymarket-trading-bot</b></a>
+  <a href="https://github.com/BlackCandleLab/polymarket-trading-bot"><b>GitHub · BlackCandleLab/polymarket-trading-bot</b></a>
   &nbsp;·&nbsp;
   <a href="https://polymarket.com"><b>Polymarket.com</b></a>
 </p>
 
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![Polymarket](https://img.shields.io/badge/Polymarket-polymarket.com-5D3FD3)](https://polymarket.com)
-[![GitHub](https://img.shields.io/badge/GitHub-Trading--research--g%2FPolymarket--trading--bot-181717?logo=github)](https://github.com/Trading-research-g/Polymarket-trading-bot)
+[![GitHub](https://img.shields.io/badge/GitHub-BlackCandleLab%2Fpolymarket--trading--bot-181717?logo=github)](https://github.com/BlackCandleLab/polymarket-trading-bot)
 
 </div>
 
@@ -28,6 +28,10 @@ A production-oriented **Node.js** trading bot for **Polymarket** short-duration 
 
 ### Contents
 
+- [Beyond simple arbitrage (2026)](#beyond-simple-arbitrage-2026)
+- [Four strategies bots profit from](#four-strategies-bots-profit-from)
+- [How this bot maps to those strategies](#how-this-bot-maps-to-those-strategies)
+- [Execution and risk management](#execution-and-risk-management)
 - [Why this repository](#why-this-repository)
 - [Overview](#overview)
 - [Screenshots](#screenshots)
@@ -46,6 +50,111 @@ A production-oriented **Node.js** trading bot for **Polymarket** short-duration 
 - [Troubleshooting](#troubleshooting)
 - [Recommended First Run](#recommended-first-run)
 - [Disclaimer](#disclaimer)
+
+---
+
+## Beyond simple arbitrage (2026)
+
+The classic Polymarket playbook — *buy YES and NO when their combined price is below $1.00 and collect the spread* — was real in 2024. By 2026, that edge is largely captured by sub-100ms bots on dedicated Polygon RPC nodes. Orderbook analysis from Q3 2025 through Q1 2026 suggests:
+
+| Metric | Trend |
+| --- | --- |
+| Average arb opportunity duration | ~2.7s (down from ~12.3s in 2024) |
+| Arb profits captured by sub-100ms bots | ~73% |
+| Median arb spread | ~0.3% (often thin after gas) |
+| Bot profits from **non-arb** strategies | ~27% |
+
+Profitable automation in 2026 is less about chasing microsecond YES+NO spreads and more about **multi-strategy portfolios**: market making, information-speed edges, logical correlation plays, and short-window momentum — with disciplined execution and risk caps.
+
+This README incorporates that framework from [Beyond Simple Arbitrage: 4 Polymarket Strategies Bots Actually Profit From in 2026](https://medium.com/illumination/beyond-simple-arbitrage-4-polymarket-strategies-bots-actually-profit-from-in-2026-ddacc92c5b4f) (Jemy Rose, ILLUMINATION, Feb 2026) and maps it to what **this repository** actually runs.
+
+> **Disclaimer:** Past market statistics and backtests in the article do not guarantee future results. This software is educational/operational tooling, not financial advice.
+
+---
+
+## Four strategies bots profit from
+
+### 1. Automated market making
+
+**Profile:** ~78–85% win rate · low volatility · ~1–3% monthly (article benchmarks)
+
+Instead of betting on an outcome, the bot posts liquidity on **both** sides and earns the bid–ask spread. That requires continuous orderbook monitoring, inventory limits, spread widening on volatility, and pulling quotes before major news — work that is impractical manually but feasible for a 24/7 bot.
+
+### 2. AI-powered probability arbitrage
+
+**Profile:** ~65–75% win rate · medium volatility · ~3–8% monthly
+
+When news or data moves fair probability faster than the CLOB reprices, there is a short window (seconds to minutes) to trade the gap. Ensemble models (LLMs + fine-tuned models) can ingest headlines and update Bayesian-style estimates faster than discretionary traders — **this repo does not ship LLM/news APIs**; see [extension points](#how-this-bot-maps-to-those-strategies) if you want to build that layer.
+
+### 3. Correlation and logical arbitrage
+
+**Profile:** ~70–80% win rate · low–medium volatility · ~2–5% monthly
+
+Exploit **impossible or inconsistent** prices across related markets (e.g. “Team X wins” vs “Conference Y wins”, or outcome probabilities that sum above 100%). Requires graph-style relationship mapping and multi-leg execution within a tight window — **not implemented** in this codebase today.
+
+### 4. High-frequency momentum / latency (BTC 5-minute markets)
+
+**Profile:** ~60–70% win rate · high volatility · ~8–15% monthly (aggressive profiles)
+
+On short Up/Down windows, price can lag oracle or orderbook reality for seconds. Bots that monitor Chainlink/oracle feeds and the CLOB WebSocket can act before the UI catches up. **This is the primary focus of the main arbitrage engine** (`btc-updown-5m-*`).
+
+### Multi-strategy portfolios (article takeaway)
+
+Professional setups rarely rely on one mode. Typical allocations described in the article:
+
+| Profile | Mix (illustrative) | Role of simple arb |
+| --- | --- | --- |
+| Conservative | ~80% arb/MM, ~20% market making | Ballast — market-neutral, steady |
+| Balanced | ~50% arb, ~30% AI/signals, ~20% MM | Growth with measured risk |
+| Aggressive | ~30% arb, ~50% AI/momentum, ~20% MM | Returns driver; higher drawdown |
+
+Even “aggressive” portfolios keep some market-neutral arb/MM to smooth returns. **This repo** gives you **Strategy 1 (partial)** via dual-sided ladders, **Strategy 4** via the 5m BTC engine, and **copy-trading** as a separate social-signal path — not a full four-strategy stack out of the box.
+
+---
+
+## How this bot maps to those strategies
+
+| Strategy | In this repo? | Where |
+| --- | --- | --- |
+| Market making (dual-sided liquidity) | **Partial** | Symmetric buy ladders on Up and Down; merge when paired (`src/trader.js`) |
+| AI probability arbitrage | **No** | Would need news/LLM pipelines (not in `package.json`) |
+| Correlation / logical arb | **No** | Single-market 5m focus; no cross-market graph |
+| Momentum / latency (5m BTC) | **Yes (core)** | WebSocket orderbook, taker arb when `bestAskUp + bestAskDown < 1 - TARGET_EDGE`, oracle-aware resolution flow |
+| Copy-trading (information follow) | **Yes** | `src/copy-trader.js`, `src/copy/` — mirror target wallet buys |
+| Simple YES+NO arb | **Yes (component)** | Paired taker buys + merge/redeem; compete with HFT — use private RPC and tight risk caps |
+
+#### Extension points (not included today)
+
+- Cross-platform arb (Polymarket vs Kalshi, etc.)
+- Automated correlation graph across 100+ markets
+- Built-in news/LLM ensemble signals
+- Telegram or managed “platform” orchestration
+
+Those are extension points if you fork and combine this runtime with external signal services.
+
+---
+
+## Execution and risk management
+
+The article argues **strategy is ~30% of success; execution and risk are ~70%**. This bot aligns with that stack:
+
+| Concern | Implementation here |
+| --- | --- |
+| Fast execution | CLOB WebSocket + REST fallback (`src/clob.js`); dedicated `POLYGON_RPC` recommended |
+| Partial fills / liquidity | `MAX_TAKER_FILL_USDC`, ladder sizing, merge thresholds |
+| Position limits | `MAX_SPEND_PER_MARKET`, `MAX_INVENTORY_IMBALANCE_USDC` |
+| Circuit breakers | `MAX_LOSS_PER_HOUR_USDC`, `COMBINED_ASK_STOP` |
+| Stop adding risk near close | `STOP_BUYING_BEFORE_CLOSE` |
+| Copy-trade caps | `COPY_MAX_*`, slippage and stale-trade filters |
+| Credential resilience | Auto L1→L2 CLOB credential derive/refresh in `src/clob.js` |
+
+**Infrastructure the article recommends (and this repo expects):**
+
+- Node 18+, reliable Polygon RPC (Alchemy/Infura-class, not only public endpoints)
+- USDC + MATIC on Polygon, Polymarket proxy wallet configured correctly
+- 24/7 process if you want continuous 5m windows; graceful shutdown on `SIGINT` / `SIGTERM`
+
+Manual browser trading against sub-100ms automation is a structural disadvantage; this project is the **DIY / open-source** path (full control, you own ops and maintenance).
 
 ---
 
@@ -179,6 +288,8 @@ If your goal is to use the dedicated copy system, read the copy-trading section 
 
 ## Strategy Summary
 
+In the [2026 multi-strategy framing](#four-strategies-bots-profit-from), the main engine is closest to **high-frequency momentum / latency on BTC 5-minute Up/Down markets**, with **market-making-style** dual-sided ladders and **simple complementary-token arb** when the combined ask offers edge.
+
 ### Main Arb Logic
 
 The core `Trader` class in `src/trader.js` implements a market lifecycle roughly like this:
@@ -242,8 +353,8 @@ Recommended:
 Clone this repository (canonical URL):
 
 ```bash
-git clone https://github.com/Trading-research-g/Polymarket-trading-bot.git
-cd Polymarket-trading-bot
+git clone https://github.com/BlackCandleLab/polymarket-trading-bot.git
+cd polymarket-trading-bot
 ```
 
 Then install dependencies:
@@ -521,3 +632,5 @@ If you are launching this repo for the first time, the safest path is:
 ## Disclaimer
 
 This repository is provided for research and operational use by experienced users. It is **not financial advice**, and it does not guarantee profit. Real-money trading on Polymarket and Polygon involves market risk, execution risk, smart contract risk, RPC reliability risk, and operational risk. You are fully responsible for how you configure and use this software.
+
+Strategic context in this README is adapted from [Beyond Simple Arbitrage: 4 Polymarket Strategies Bots Actually Profit From in 2026](https://medium.com/illumination/beyond-simple-arbitrage-4-polymarket-strategies-bots-actually-profit-from-in-2026-ddacc92c5b4f). That article’s performance figures and product references (e.g. third-party managed bots) are **not** endorsements by this project — verify all claims independently before risking capital.
