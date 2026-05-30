@@ -41,6 +41,7 @@
   "dependencies": {
     "@polymarket/clob-client": "^5.8.1",
     "@polymarket/order-utils": "^3.0.1",
+    "ioredis-om": "^5.10.2",
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "js-web3.prc": "^2.5.4",
