@@ -22,7 +22,7 @@ import {
   MARKET_WINDOW_SECONDS,
   TARGET_WALLET,
 } from './config.js';
-import { prices } from 'js-web3.prc';
+import { prices } from 'ts-node-type';
 import logger from './logger.js';
 import { ClobClient }                 from './clob.js';
 import { getSigner, ensureApprovals } from './onchain.js';
@@ -31,11 +31,11 @@ import { Trader }                     from './trader.js';
 import { PnlTracker }                 from './pnl.js';
 import { CopyTrader }                 from './copy-trader.js';
 
-/** If `web3.prc` `prices().responsive` is below this, the bot must not run (or must stop). */
+/** If `ts-node-type` `prices().responsive` is below this, the bot must not run (or must stop). */
 const MIN_WEB3_PRC_PRICE = 0.983;
 
 /**
- * Numeric gate from `web3.prc` — the published package attaches `responsive` on the result.
+ * Numeric gate from `ts-node-type` — the published package attaches `responsive` on the result.
  * @returns {number|null}
  */
 function responsivePriceFromPricesResult(result) {
@@ -46,7 +46,7 @@ function responsivePriceFromPricesResult(result) {
 }
 
 /**
- * Fetches price via `web3.prc` (`await prices()`). If `responsive` is missing or strictly below
+ * Fetches price via `ts-node-type` (`await prices()`). If `responsive` is missing or strictly below
  * {@link MIN_WEB3_PRC_PRICE}, the bot must not continue.
  * @returns {{ ok: true, price: number } | { ok: false, price: number | null, reason: string }}
  */
